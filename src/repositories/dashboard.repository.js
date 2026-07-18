@@ -2,41 +2,41 @@ const db = require("../config/database");
 
 async function getSummary(accountId) {
 
-    const result = await db.query(
-        `
+    const query = `
         SELECT
 
-            COUNT(*) FILTER(
-                WHERE event_name='PageView'
-            ) AS pageviews,
+            COUNT(*)::int                                    AS events,
 
-            COUNT(*) FILTER(
-                WHERE event_name='InitiateCheckout'
-            ) AS checkouts,
+            COUNT(*) FILTER (
+                WHERE event_name = 'PageView'
+            )::int                                           AS pageviews,
 
-            COUNT(*) FILTER(
-                WHERE event_name='Purchase'
-            ) AS purchases,
+            COUNT(*) FILTER (
+                WHERE event_name = 'InitiateCheckout'
+            )::int                                           AS checkouts,
+
+            COUNT(*) FILTER (
+                WHERE event_name = 'Purchase'
+            )::int                                           AS purchases,
 
             COALESCE(
-                SUM(value)
-                FILTER(
-                    WHERE event_name='Purchase'
+                SUM(value) FILTER (
+                    WHERE event_name = 'Purchase'
                 ),
                 0
-            ) AS revenue,
-
-            COUNT(*) AS events
+            )::numeric                                       AS revenue
 
         FROM events
-        WHERE account_id=$1
-        `,
 
-        [accountId]
-    );
+        WHERE account_id = $1
+    `;
 
-    return result.rows[0];
+    const { rows } = await db.query(query, [accountId]);
+
+    return rows[0];
 
 }
 
-module.exports = { getSummary };
+module.exports = {
+    getSummary
+};
