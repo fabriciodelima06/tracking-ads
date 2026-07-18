@@ -2,7 +2,7 @@ const router = require("express").Router();
 
 const accountsController = require("../controllers/accounts.controller");
 
-const dashboardRoutes = require("./dashboard.routes");
+const dashboardRoutes = require("../analytics/routes/dashboard.routes");
 const eventsRoutes = require("./events.routes");
 
 // Contas
